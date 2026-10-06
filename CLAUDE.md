@@ -38,6 +38,8 @@ awk '/<script>/{f=1;next}/<\/script>/{f=0}f' index.html > /tmp/app.js && node --
 grep -nE 'localStorage|sessionStorage|indexedDB|document\.cookie|alert\(|confirm\(|!important|src="http|href="http|@import' index.html
 ```
 
+The Playwright MCP server (`.mcp.json`, project scope) can drive the page in a real browser; open it at `file:///…/index.html` or through the local HTTP server. It needs Node 20 or newer: on Node 18.13 it crashes on startup with `getDefaultAutoSelectFamilyAttemptTimeout is not a function`. If your default Node is older, add a local-scope override that points at a newer `npx`.
+
 To test behaviour without editing `index.html`, copy it to a scratch file, add a `<script>` before `</body>` that drives the UI (`.click()`, `form.requestSubmit()`, dispatching `DragEvent`s with a `DataTransfer`) and writes PASS/FAIL into a `<pre>`, then run:
 
 ```sh

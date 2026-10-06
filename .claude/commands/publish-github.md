@@ -55,6 +55,25 @@ Create or update `README.md` from what's actually in the repo (code, `CLAUDE.md`
 - how deployment works (the CI/CD workflow)
 - the tech constraints that matter to contributors (vanilla JS, single file, no persistence, no external resources)
 
+## 2b. Screenshots for the README (Playwright MCP)
+
+Capture fresh screenshots with the project's Playwright MCP server (`.mcp.json`), then embed them in the README.
+
+1. Make sure the `mcp__playwright__*` tools are available.
+   - If the server was only just added, its tools won't load until the next session. Tell the user to restart Claude Code and re-run this command, or skip this step and say so in the final report.
+   - The server needs Node 20 or newer. If it fails to start on an older default Node, see the Playwright note in `CLAUDE.md`.
+2. Serve the app locally so the screenshot matches the commit being pushed, rather than the old live site: run `python3 -m http.server 8765 --bind 127.0.0.1` in the background from the repo root.
+3. Use the Playwright tools to:
+   - `browser_resize` to 1440×900, then `browser_navigate` to `http://127.0.0.1:8765/index.html`
+   - `browser_take_screenshot` with `filename: "docs/screenshots/board-desktop.png"`
+   - `browser_resize` to 390×844, then `browser_take_screenshot` with `filename: "docs/screenshots/board-mobile.png"`
+
+   Relative filenames are resolved against the server's working directory, which is the repo root. Check the files ended up in `docs/screenshots/` and not loose in the repo root; move them if needed.
+4. Stop the HTTP server and `browser_close`.
+5. Open each image with Read and check it shows the seeded board fully rendered, with no error page or half-loaded layout. Retake it if not.
+6. Under the README's **Live demo** line, add or refresh a `## Screenshots` section. Use the desktop image as a Markdown image and the mobile image as `<img ... width="260">`, both with descriptive alt text, and keep the existing file names so the links stay valid.
+7. Screenshots go through the same security scan as everything else. Make sure they show only demo data: no real names, emails, tokens or internal URLs.
+
 ## 3. GitHub Actions CI/CD
 
 Create or update `.github/workflows/deploy-pages.yml`. If there's an existing workflow, edit it instead of adding a duplicate. It needs:
@@ -72,7 +91,7 @@ Create or update `.github/workflows/deploy-pages.yml`. If there's an existing wo
 
 ## 4. Commit and push
 
-- Commit the README, the workflow, `.gitignore` and any scan fixes, with clear messages. Follow this session's commit attribution rules.
+- Commit the README, `docs/screenshots/`, the workflow, `.gitignore` and any scan fixes, with clear messages. Follow this session's commit attribution rules.
 - Set `origin` to the provided URL. If `origin` already points somewhere else, ask before changing it.
 - Push with `git push -u origin main`. **Never force-push.** If the remote has commits you don't have (e.g. a README created on GitHub), stop and ask how the user wants to combine them.
 
