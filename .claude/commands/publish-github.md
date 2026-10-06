@@ -99,7 +99,7 @@ Create or update `.github/workflows/deploy-pages.yml`. If there's an existing wo
 
 The Pages source must be **GitHub Actions**.
 - **With `gh`:** run `gh api repos/OWNER/REPO/pages --jq .build_type`. If that 404s, run `gh api -X POST repos/OWNER/REPO/pages -f build_type=workflow`. If it returns `legacy`, run `gh api -X PUT repos/OWNER/REPO/pages -f build_type=workflow`.
-- **Without `gh`:** tell the user to open `https://github.com/OWNER/REPO/settings/pages` and set **Build and deployment → Source → GitHub Actions**. Then wait for confirmation, or poll `https://api.github.com/repos/OWNER/REPO/pages` every 90s or more. Unauthenticated requests are limited to 60 an hour, and an empty or unparseable response is *not* a change.
+- **Without `gh`:** tell the user to open `https://github.com/OWNER/REPO/settings/pages` and set **Build and deployment → Source → GitHub Actions**. Then wait for their confirmation. **Don't** use the `repos/OWNER/REPO/pages` API to detect this without logging in: it returns 404 even when Pages is enabled. Instead, check whether the latest run's `deploy` job got past `configure-pages`, or whether the Pages URL returns HTTP 200. Poll every 90s or more, because unauthenticated requests are limited to 60 an hour, and treat an empty or unparseable response as *no* change.
 - If the first workflow run failed because Pages wasn't enabled, re-run it (`gh run rerun <id>` or the **Re-run all jobs** button). Without `gh`, ask the user before pushing an empty commit to trigger it.
 
 ## 6. Repo About section
