@@ -26,6 +26,8 @@ open index.html                 # board works fully from file://
 python3 -m http.server 8000     # needed for real FormSubmit delivery (it tends to reject file:// requests, which send no page address)
 ```
 
+Deployment: `.github/workflows/deploy-pages.yml` publishes `index.html` to GitHub Pages on every push to `main`. In the repo settings, Pages → Source must be set to "GitHub Actions". The live site is served over HTTPS, so FormSubmit works there.
+
 Quick checks after editing:
 
 ```sh
