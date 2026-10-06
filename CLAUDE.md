@@ -26,7 +26,7 @@ open index.html                 # board works fully from file://
 python3 -m http.server 8000     # needed for real FormSubmit delivery (it tends to reject file:// requests, which send no page address)
 ```
 
-Deployment: `.github/workflows/deploy-pages.yml` publishes `index.html` to GitHub Pages on every push to `main`. In the repo settings, Pages → Source must be set to "GitHub Actions". The live site is served over HTTPS, so FormSubmit works there.
+Deployment: `.github/workflows/deploy-pages.yml` has two jobs. `ci` runs on every push and PR: the syntax check, the constraint grep below, and a Gitleaks secret scan. `deploy` runs only on `main`, after `ci` passes, and publishes `index.html` to GitHub Pages. In the repo settings, Pages → Source must be set to "GitHub Actions". The live site is served over HTTPS, so FormSubmit works there. `/publish-github <repo-url>` (in `.claude/commands/`) runs the whole publish process: secret scan, README, CI/CD, Pages and the About section.
 
 Quick checks after editing:
 

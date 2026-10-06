@@ -1,41 +1,78 @@
-name: Deploy to GitHub Pages
+name: CI / Deploy to GitHub Pages
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-# Allow one deployment at a time; don't cancel a run that's already deploying
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
-  deploy:
+  # Runs on every push and PR: syntax check, project constraints, secret scan
+  ci:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # full history for the secret scan
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Syntax-check inline script
+        run: |
+          awk '/<script>/{f=1;next}/<\/script>/{f=0}f' index.html > "$RUNNER_TEMP/app.js"
+          test -s "$RUNNER_TEMP/app.js"
+          node --check "$RUNNER_TEMP/app.js"
+
+      - name: Enforce project constraints
+        run: |
+          if grep -nE 'localStorage|sessionStorage|indexedDB|document\.cookie|alert\(|confirm\(|!important|(src|href)="https?://' index.html; then
+            echo "::error file=index.html::Forbidden API or external resource found (see constraints in CLAUDE.md)"
+            exit 1
+          fi
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: false
+
+  # Publishes the app only after CI passes, and only from main
+  deploy:
+    needs: ci
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    # Allow one deployment at a time; don't cancel a run that's already deploying
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
-      # Publish only the app itself, not CLAUDE.md or the workflow files
+      # Publish only the app itself, not CLAUDE.md, README or workflow files
       - name: Prepare site
         run: |
           mkdir _site
           cp index.html _site/
           touch _site/.nojekyll
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
