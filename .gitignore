@@ -1,0 +1,21 @@
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+id_rsa*
+credentials*.json
+service-account*.json
+.npmrc
+.pypirc
+
+# Personal Claude Code settings (project commands in .claude/commands are shared)
+.claude/settings.local.json
+
+# OS / editor / logs
+.DS_Store
+*.log
