@@ -19,3 +19,10 @@ service-account*.json
 # OS / editor / logs
 .DS_Store
 *.log
+
+# Third-party skill without a licence: keep local, don't publish (see CLAUDE.md)
+.claude/skills/cybersecurity-analyst/
+
+# Python bytecode (from running skill scripts)
+__pycache__/
+*.pyc

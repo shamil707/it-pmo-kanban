@@ -48,6 +48,18 @@ To test behaviour without editing `index.html`, copy it to a scratch file, add a
 
 Headless Chrome enforces a minimum window width of about 500px. To check the layout below 768px, screenshot the page inside a fixed-width `<iframe>`.
 
+## Project skills (`.claude/skills/`)
+
+Three third-party skills were installed with `npx skills add … -a claude-code --copy` and reviewed on 2026-10-06. The sources are recorded in `skills-lock.json`. Each `SKILL.md` starts with a **"Project overrides: IT PMO Kanban"** section that takes priority over the upstream text below it:
+- **`frontend-design`** (anthropics/skills, Apache-2.0): visual and UI changes within the blue tokens, system fonts and single-file rules.
+- **`ui-ux-pro-max`** (nextlevelbuilder, MIT): UX and accessibility checks.
+  - The offline search script is `python3 .claude/skills/ui-ux-pro-max/scripts/search.py …`, run from the repo root. The upstream `${CLAUDE_PLUGIN_ROOT}` path was rewritten.
+  - Never use `--stack`, and discard web-font, icon-package and GSAP suggestions.
+- **`cybersecurity-analyst`** (rysweet/amplihack): a short STRIDE pass plus the project's security invariants.
+  - The upstream repo has **no licence**, so this skill is listed in `.gitignore` and kept local. Don't commit it unless the author grants permission.
+
+`npx skills update` re-downloads the upstream files and **overwrites the overrides**. Before updating, review the new version (instructions, scripts and data), then put the override sections back.
+
 ## Architecture
 
 **State → render loop.** A single `state` object is the source of truth: `tasks`, `filters`, `nextIdNumber`, plus `ui.pendingDeleteId` / `ui.openMoveId` for per-card transient UI. Each action (`addTask`, `moveTask`, `deleteTask`) changes `state` and then calls `renderBoard()`. Don't change card contents directly in the DOM.
