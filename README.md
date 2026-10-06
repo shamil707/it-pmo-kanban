@@ -6,6 +6,14 @@ A single-page Kanban board for the internal IT Project Management Office of a fi
 
 > Demo mode: the board lives in memory only. Refreshing the page resets it to the eight sample tasks.
 
+## Screenshots
+
+![Desktop view: four Kanban columns with priority-coloured task cards, a filter bar and a live summary strip](docs/screenshots/board-desktop.png)
+
+<img src="docs/screenshots/board-mobile.png" alt="Mobile view: summary strip, filters and columns stacked vertically" width="260">
+
+*Desktop (1440×900) and mobile (390×844) views, captured with the Playwright MCP server.*
+
 ## Features
 
 - **Four fixed columns:** Backlog, In Progress, Blocked and Done, each with a live task count.
